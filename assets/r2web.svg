@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#15311f"/>
+      <stop offset=".55" stop-color="#0d1c12"/>
+      <stop offset="1" stop-color="#070d09"/>
+    </linearGradient>
+    <linearGradient id="helix" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#57ff9a"/>
+      <stop offset="1" stop-color="#1f9d54"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".38" r=".65">
+      <stop offset="0" stop-color="#3ddc84" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#3ddc84" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- squircle body -->
+  <rect x="16" y="16" width="224" height="224" rx="54" fill="url(#bg)"/>
+  <rect x="16" y="16" width="224" height="224" rx="54" fill="url(#glow)"/>
+  <rect x="17.5" y="17.5" width="221" height="221" rx="52.5" fill="none" stroke="#3ddc84" stroke-opacity=".35" stroke-width="2.5"/>
+  <!-- top sheen -->
+  <path d="M70 16h116a54 54 0 0 1 54 54v6c-40-26-184-26-224 0v-6a54 54 0 0 1 54-54z" fill="#ffffff" opacity=".04"/>
+
+  <!-- DNA double helix -->
+  <g filter="url(#soft)" stroke="url(#helix)" stroke-width="11" stroke-linecap="round" fill="none">
+    <path d="M96 60 C168 96 168 160 96 196"/>
+    <path d="M160 60 C88 96 88 160 160 196"/>
+  </g>
+  <!-- rungs -->
+  <g stroke="#bff7d4" stroke-width="6.5" stroke-linecap="round" opacity=".9">
+    <line x1="104" y1="78" x2="152" y2="78"/>
+    <line x1="118" y1="102" x2="138" y2="102"/>
+    <line x1="118" y1="154" x2="138" y2="154"/>
+    <line x1="104" y1="178" x2="152" y2="178"/>
+  </g>
+  <!-- nucleotide nodes -->
+  <g fill="#eafff2">
+    <circle cx="96" cy="60" r="8.5"/><circle cx="160" cy="60" r="8.5"/>
+    <circle cx="96" cy="196" r="8.5"/><circle cx="160" cy="196" r="8.5"/>
+  </g>
+
+  <!-- decompile braces watermark -->
+  <text x="128" y="230" text-anchor="middle" font-family="monospace" font-weight="700"
+        font-size="30" fill="#3ddc84" opacity=".55">{ }</text>
+</svg>

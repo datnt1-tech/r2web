@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.1
+Name=r2web decompiler
+GenericName=Drag-drop decompiler
+Comment=Drop a .so/ELF to decompile with Ghidra + radare2 in parallel
+Exec=__R2WEB_DIR__/run.sh
+Icon=r2web
+Terminal=true
+Categories=Development;Debugger;
+Keywords=decompile;ghidra;radare2;reverse;disassemble;binary;so;elf;
+StartupNotify=true
