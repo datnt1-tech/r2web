@@ -4,6 +4,8 @@ A drag-and-drop web UI for decompiling native binaries with **Ghidra + radare2**
 running the decompiler in **parallel across every CPU core**. Drop a `.so` / ELF /
 `.o` / `.a` / `.bin` onto the page and get a single, ready-to-read `.c` file.
 
+![r2web UI](docs/screenshots/main.png)
+
 - **Zero pip dependencies** — pure Python standard library (`http.server`).
 - **Parallel decompilation** — analyzes once, then splits the functions across
   N radare2 worker processes (N = your CPU core count) that stream progress live.
