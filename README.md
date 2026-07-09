@@ -13,6 +13,8 @@ running the decompiler in **parallel across every CPU core**. Drop a `.so` / ELF
   (or your OS default), then open it in whatever IDE you like.
 - Dark-green terminal-flavored UI, centered workspace.
 
+📐 **Full architecture write-up + diagram:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
 ## How it works
 
 ```
@@ -37,11 +39,19 @@ drop file ──HTTP POST /api/decompile──▶ radare2 analysis (aaa)
 
 Optional: a file manager (Dolphin/Nautilus/…) for the "open folder" button.
 
+Don't have radare2/r2ghidra yet? Run the bundled installer (Arch/Debian/Fedora/…
+auto-detected; radare2 via the system package manager, r2ghidra via `r2pm`):
+
+```bash
+./install-deps.sh
+```
+
 ## Install
 
 ```bash
-git clone https://github.com/<you>/r2web.git
+git clone https://github.com/datnt1-tech/r2web.git
 cd r2web
+./install-deps.sh     # (optional) install radare2 + r2ghidra
 ./install.sh          # symlinks `r2web`, installs the icon + .desktop entry (no root)
 ```
 

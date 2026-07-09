@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="30.2.6">
+  <diagram name="r2web-architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="1120" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="r2web — drag-drop Ghidra + radare2 parallel decompiler" style="text;html=1;align=left;verticalAlign=middle;fontStyle=1;fontSize=20;fontColor=#1f7a44;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="800" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Pure-stdlib Python backend · project = folder · N r2 workers (N = CPU cores) → one .c file" style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#5c7d63;" vertex="1" parent="1">
+          <mxGeometry x="40" y="38" width="900" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ================= BAND A: Browser ================= -->
+        <mxCell id="bA" value="Browser — static/index.html (single-file Web UI)" style="swimlane;startSize=30;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontColor=#1a3c6e;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="1120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="🧬 Drop zone / file picker&#xa;(drag anywhere or click)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;" vertex="1" parent="bA">
+          <mxGeometry x="30" y="60" width="230" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="📁 Project dropdown&#xa;(switch = ~/r2web/&amp;lt;proj&amp;gt;)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;" vertex="1" parent="bA">
+          <mxGeometry x="300" y="60" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="⏳ Progress modal&#xa;(funcs/sec · threads)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;" vertex="1" parent="bA">
+          <mxGeometry x="560" y="60" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" value="📄 Result list (.c files)&#xa;click → open folder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2ff;strokeColor=#6c8ebf;" vertex="1" parent="bA">
+          <mxGeometry x="830" y="60" width="250" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ================= BAND B: Backend ================= -->
+        <mxCell id="bB" value="r2web server — server.py (ThreadingHTTPServer @ 127.0.0.1:8765, stdlib only)" style="swimlane;startSize=30;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontColor=#7a4a00;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="290" width="1120" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="HTTP API router&#xa;/api/decompile · /status · /result&#xa;/projects · /tree · /open" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;" vertex="1" parent="bB">
+          <mxGeometry x="30" y="55" width="320" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" value="Job manager&#xa;async job store + background thread&#xa;(status / rate / done)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2e0;strokeColor=#d79b00;" vertex="1" parent="bB">
+          <mxGeometry x="430" y="55" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" value="safe_path() sandbox&#xa;all I/O under ~/r2web/" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf0e0;strokeColor=#d79b00;dashed=1;" vertex="1" parent="bB">
+          <mxGeometry x="800" y="55" width="280" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ================= BAND C: Decompile pipeline ================= -->
+        <mxCell id="bC" value="Decompile pipeline — radare2 + r2ghidra (parallel across all CPU cores)" style="swimlane;startSize=30;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontColor=#2d5a2d;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="1120" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value="radare2 analysis (once)&#xa;aaa → discover functions&#xa;aflj (filter imports/loc)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f5e6;strokeColor=#82b366;" vertex="1" parent="bC">
+          <mxGeometry x="30" y="120" width="250" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Split functions&#xa;across N chunks&#xa;(N = CPU cores)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="bC">
+          <mxGeometry x="330" y="120" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="c3a" value="r2 worker #1 — af; pdg @ addr  (streams markers)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f5e6;strokeColor=#82b366;" vertex="1" parent="bC">
+          <mxGeometry x="560" y="55" width="290" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c3b" value="r2 worker #2 — af; pdg @ addr  (streams markers)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f5e6;strokeColor=#82b366;" vertex="1" parent="bC">
+          <mxGeometry x="560" y="121" width="290" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c3c" value="r2 worker #N — af; pdg @ addr  (streams markers)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f5e6;strokeColor=#82b366;" vertex="1" parent="bC">
+          <mxGeometry x="560" y="187" width="290" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="Concatenate&#xa;→ one &amp;lt;binary&amp;gt;.c&#xa;(dup → (1),(2)…)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" vertex="1" parent="bC">
+          <mxGeometry x="910" y="105" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ================= BAND D: Storage & OS ================= -->
+        <mxCell id="bD" value="Storage &amp; OS integration" style="swimlane;startSize=30;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#333333;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="880" width="1120" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="~/r2web/&amp;lt;project&amp;gt;/&amp;lt;binary&amp;gt;.c&#xa;projects = plain folders" style="shape=folder;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#666666;fontColor=#333333;verticalAlign=bottom;" vertex="1" parent="bD">
+          <mxGeometry x="30" y="55" width="300" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="Dolphin / OS file manager&#xa;kstart --application · DBus FileManager1&#xa;(reveal folder, Wayland-safe raise)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#4a2d5a;" vertex="1" parent="bD">
+          <mxGeometry x="430" y="60" width="300" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ================= EDGES ================= -->
+        <mxCell id="e1" value="POST /api/decompile&#xa;(raw body · X-Filename)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a1" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="create job" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d79b00;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="b1" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="start (background thread)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b2" target="c1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="N functions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c1" target="c2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c2" target="c3a">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c2" target="c3b">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c2" target="c3c">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3a" target="c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3b" target="c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="c3c" target="c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" value="write &amp;lt;binary&amp;gt;.c" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;flowAnimation=1;strokeColor=#82b366;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c4" target="d1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1040" y="855" />
+              <mxPoint x="220" y="855" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" value="GET /api/status&#xa;poll 250 ms" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#6c8ebf;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="a3" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" value="click .c → open folder&#xa;(POST /api/open → Dolphin)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;strokeColor=#9673a6;strokeWidth=2;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="a4" target="d2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1230" y="195" />
+              <mxPoint x="1230" y="990" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ================= LEGEND ================= -->
+        <mxCell id="legend" value="Legend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;verticalAlign=top;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="850" y="10" width="310" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="lg1" value="" style="rounded=0;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="30" width="24" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="lg1t" value="Browser" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="legend">
+          <mxGeometry x="38" y="27" width="52" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="lg2" value="" style="rounded=0;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="legend">
+          <mxGeometry x="95" y="30" width="24" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="lg2t" value="Backend" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="legend">
+          <mxGeometry x="123" y="27" width="52" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="lg3" value="" style="rounded=0;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="legend">
+          <mxGeometry x="180" y="30" width="24" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="lg3t" value="Decompile" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="legend">
+          <mxGeometry x="208" y="27" width="58" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="lg4" value="" style="rounded=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="legend">
+          <mxGeometry x="270" y="30" width="24" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="lg4t" value="OS" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="legend">
+          <mxGeometry x="298" y="27" width="20" height="18" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
