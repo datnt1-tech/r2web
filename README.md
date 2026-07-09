@@ -29,15 +29,18 @@ drop file ──HTTP POST /api/decompile──▶ radare2 analysis (aaa)
 
 `pdg` is the Ghidra decompiler exposed inside radare2 by the **r2ghidra** plugin.
 
+Runs on **Linux** and **macOS**.
+
 ## Requirements
 
-| Tool | Purpose | Arch / CachyOS |
-|------|---------|----------------|
-| `python3` | backend (stdlib only) | `sudo pacman -S python` |
-| `radare2` | analysis + orchestration | `sudo pacman -S radare2` |
-| `r2ghidra` | the `pdg` Ghidra decompiler | `r2pm -Uci r2ghidra` |
+| Tool | Purpose | Arch / CachyOS | macOS |
+|------|---------|----------------|-------|
+| `python3` | backend (stdlib only) | `sudo pacman -S python` | preinstalled / `brew install python` |
+| `radare2` | analysis + orchestration | `sudo pacman -S radare2` | `brew install radare2` |
+| `r2ghidra` | the `pdg` Ghidra decompiler | `r2pm -Uci r2ghidra` | `r2pm -Uci r2ghidra` |
 
-Optional: a file manager (Dolphin/Nautilus/…) for the "open folder" button.
+Optional: a file manager for the "open folder" button — Dolphin/Nautilus/… on Linux,
+**Finder** on macOS (used automatically via `open -R`).
 
 Don't have radare2/r2ghidra yet? Run the bundled installer (Arch/Debian/Fedora/…
 auto-detected; radare2 via the system package manager, r2ghidra via `r2pm`):
@@ -61,9 +64,11 @@ Then run from a terminal:
 r2web                 # starts the server and opens the browser at http://127.0.0.1:8765
 ```
 
-…or launch **“r2web decompiler”** from your application menu. The launcher runs the
-server in the foreground of its terminal window — **press Ctrl+C or close the window
-to stop it** (it is not a background daemon).
+…or launch **“r2web decompiler”** from your application menu. On **Linux** `install.sh`
+adds a `.desktop` entry + icon; on **macOS** it builds `~/Applications/r2web.app`
+(with an `.icns` icon) that opens the server in a Terminal window. Either way the
+launcher runs the server in the foreground of its terminal window — **press Ctrl+C or
+close the window to stop it** (it is not a background daemon).
 
 You can also run it directly without installing:
 

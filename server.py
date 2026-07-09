@@ -13,12 +13,16 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
+
+IS_MAC = sys.platform == "darwin"
+IS_LINUX = sys.platform.startswith("linux")
 
 HOST = os.environ.get("R2WEB_HOST", "127.0.0.1")
 PORT = int(os.environ.get("R2WEB_PORT", "8765"))
@@ -42,7 +46,10 @@ SAFE_NAME = re.compile(r"[^A-Za-z0-9._@-]+")
 
 def repair_session_env():
     """Best-effort fill of the desktop-session vars a background server may be
-    missing, so launching the file manager (kstart/dbus) actually works."""
+    missing, so launching the file manager (kstart/dbus) actually works.
+    Linux/X11/Wayland only — macOS has no such session vars."""
+    if not IS_LINUX:
+        return
     xrd = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
     os.environ.setdefault("XDG_RUNTIME_DIR", xrd)
     if not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
@@ -87,6 +94,21 @@ def open_in_filemanager(path):
     path = os.path.abspath(path)
     if not os.path.exists(path):
         return False, f"path not found: {path}"
+
+    # macOS: Finder via `open`. `-R` reveals+selects a file; a dir just opens.
+    if IS_MAC:
+        cmd = ["open", "-R", path] if os.path.isfile(path) else ["open", path]
+        try:
+            r = subprocess.run(cmd, capture_output=True, timeout=6)
+            if r.returncode == 0:
+                print(f"[open] {path} via Finder (open)")
+                return True, "open"
+            err = (r.stderr or b"").decode(errors="replace").strip() or f"exit {r.returncode}"
+            print(f"[open] Finder failed: {err}")
+            return False, err
+        except Exception as e:  # noqa: BLE001
+            return False, f"open: {e}"
+
     if not os.environ.get("DISPLAY") and not os.environ.get("WAYLAND_DISPLAY"):
         msg = "no DISPLAY/WAYLAND_DISPLAY — start r2web from your desktop session."
         print("[open] " + msg)

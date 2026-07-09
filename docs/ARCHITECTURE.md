@@ -75,12 +75,13 @@ dominates wall-clock on large libraries — is parallelized. Measured scaling on
 - **Projects are plain folders.** `~/r2web/` is the root; each project is a sibling
   directory (the default `tmp` is created on first start). Output `.c` files land in the
   selected project. Nothing is hidden in a database — you can `cd` in and use any tool.
-- **Open in file manager.** `POST /api/open` reveals a folder using, in order:
-  `kstart --application <fm> --url` (requests an XDG activation token so the window
-  actually raises under KDE/Wayland's focus-stealing prevention) → DBus
-  `org.freedesktop.FileManager1` `ShowFolders`/`ShowItems` → direct spawn → `xdg-open`.
-  A session-env repair step reconstructs `DBUS_SESSION_BUS_ADDRESS` / `WAYLAND_DISPLAY`
-  when the server is launched from a bare environment.
+- **Open in file manager.** `POST /api/open` reveals a folder per-platform.
+  On **macOS** it calls `open -R <file>` (reveal + select in Finder) or `open <dir>`.
+  On **Linux** it tries, in order: `kstart --application <fm> --url` (requests an XDG
+  activation token so the window actually raises under KDE/Wayland's focus-stealing
+  prevention) → DBus `org.freedesktop.FileManager1` `ShowFolders`/`ShowItems` → direct
+  spawn → `xdg-open`; a session-env repair step reconstructs `DBUS_SESSION_BUS_ADDRESS` /
+  `WAYLAND_DISPLAY` when the server is launched from a bare environment.
 
 ---
 
